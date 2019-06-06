@@ -7,9 +7,9 @@
 ## Usage
 
 ```javascript
-import { withHooks, useState, useEffect } from 'fn-with-hooks'
+import { withHooks, useState, useEffect, reset, useReducer, useMemo } from 'fn-with-hooks'
 
-const foobar = withHooks(function foobar(plus=0) {
+const foobar = withHooks((plus=0) => {
   const [count, setCount] = useState(0)
   console.log(count)
   useEffect(() => {
@@ -25,4 +25,29 @@ reset(foobar)
 
 foobar(7)
 foobar()
+
+
+function reducer(state: { count: number }, action: { type: string }) {
+  if (action.type === 'inc') {
+    return { ...state, count: state.count+1 }
+  }
+  return state
+}
+
+const zoo = withHooks(() => {
+  const [state, dispatch] = useReducer(reducer, { count: 0 })
+  console.log('check current state', state)
+
+  const chance = Math.random()
+  if (chance > 0.5) {
+    dispatch({ type: 'inc' })
+  }
+
+  console.log('check the chance', useMemo(() => chance, [state]))
+})
+
+zoo()
+zoo()
+zoo()
+zoo()
 ```

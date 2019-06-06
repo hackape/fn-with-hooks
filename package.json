@@ -1,6 +1,6 @@
 {
-  "name": "articulated-fn",
-  "version": "1.0.0",
+  "name": "fn-with-hooks",
+  "version": "0.1.0",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "author": "hackape <v@hackape.com>",

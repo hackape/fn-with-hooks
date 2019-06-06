@@ -1,6 +1,16 @@
 import { getCurrentBucket } from './internal'
 
-export function useReducer(reducer, initState: any, init: Function) {
+type Dispatch<A> = (value: A) => void
+type SetStateAction<S> = S | ((prevState: S) => S)
+type Reducer<S, A> = (prevState: S, action: A) => S
+type ReducerState<R extends Reducer<any, any>> = R extends Reducer<infer S, any> ? S : never
+type ReducerAction<R extends Reducer<any, any>> = R extends Reducer<any, infer A> ? A : never
+
+export function useReducer<R extends Reducer<any, any>, I>(
+  reducer: R,
+  initializerArg: I & ReducerState<R>,
+  initializer?: (arg: I & ReducerState<R>) => ReducerState<R>
+): [ReducerState<R>, Dispatch<ReducerAction<R>>] {
   const bucket = getCurrentBucket()
   if (!bucket) {
     throw new Error("useReducer() only valid inside an Articulated Function or a Custom Hook.")
@@ -8,17 +18,17 @@ export function useReducer(reducer, initState: any, init: Function) {
 
   if (!(bucket.nextStateIdx in bucket.states)) {
     const slot: any[] = []
-    slot[0] = typeof init === "function" ? init(initState) : initState
+    slot[0] = typeof initializer === "function" ? initializer(initializerArg) : initializerArg
     slot[1] = function dispatch(action) {
       slot[0] = reducer(slot[0], action)
     }
     bucket.states[bucket.nextStateIdx] = slot
   }
 
-  return [...bucket.states[bucket.nextStateIdx++]]
+  return [...bucket.states[bucket.nextStateIdx++]] as any
 }
 
-export function useState(initState: any) {
+export function useState<S>(initState: S | (() => S)): [S, Dispatch<SetStateAction<S>>] {
   const bucket = getCurrentBucket()
   if (!bucket) {
     throw new Error("useState() only valid inside an Articulated Function or a Custom Hook.")
@@ -28,12 +38,16 @@ export function useState(initState: any) {
     const slot = []
     slot[0] = initState
     slot[1] = function setState(state) {
-      slot[0] = state
+      if (typeof state === 'function') {
+        slot[0] = state(slot[0])
+      } else {
+        slot[0] = state
+      }
     }
     bucket.states[bucket.nextStateIdx] = slot
   }
 
-  return [...bucket.states[bucket.nextStateIdx++]]
+  return [...bucket.states[bucket.nextStateIdx++]] as any
 }
 
 function depsChanged(deps1: any[] | undefined, deps2: any[] | undefined) {
@@ -82,7 +96,7 @@ export function useEffect(fn: Function, deps?: any[]) {
   bucket.nextEffectIdx++;
 }
 
-export function useMemo(fn: Function, deps: any[]) {
+export function useMemo<T>(factory: () => T, deps: any[] | undefined): T {
   const bucket = getCurrentBucket()
   if (!bucket) {
     throw new Error("useMemo() only valid inside an Articulated Function or a Custom Hook.")
@@ -97,7 +111,7 @@ export function useMemo(fn: Function, deps: any[]) {
 
   if (depsChanged(slot[1], deps)) {
     try {
-      slot[0] = fn()
+      slot[0] = factory()
     } finally {
       slot[1] = deps
     }
@@ -108,13 +122,13 @@ export function useMemo(fn: Function, deps: any[]) {
   return slot[0]
 }
 
-export function useCallback(fn: Function, deps: any[]) {
+export function useCallback<T extends (...args: any[]) => any>(callback: T, deps: any[]): T {
   const bucket = getCurrentBucket()
   if (!bucket) {
     throw new Error("useCallback() only valid inside an Articulated Function or a Custom Hook.")
   }
 
-  return useMemo(function callback() { return fn }, deps)
+  return useMemo(() => callback, deps)
 }
 
 export function useRef(initValue: any) {

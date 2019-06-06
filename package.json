@@ -1,7 +1,8 @@
 {
   "name": "articulated-fn",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "author": "hackape <v@hackape.com>",
   "license": "MIT",
   "devDependencies": {

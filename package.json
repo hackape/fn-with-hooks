@@ -15,7 +15,8 @@
     "typescript": "^3.5.1"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "rm -rf ./lib && tsc",
+    "prepublish": "npm run build"
   },
   "files": ["lib", "src"]
 }

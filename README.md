@@ -6,6 +6,8 @@
 
 ## Usage
 
+[Live demo](https://frontarm.com/demoboard/?id=d6196ec0-083e-4c78-b708-8ee04652b099)
+
 ```javascript
 import { withHooks, useState, useEffect, reset, useReducer, useMemo } from 'fn-with-hooks'
 
@@ -27,7 +29,7 @@ foobar(7)
 foobar()
 
 
-function reducer(state: { count: number }, action: { type: string }) {
+function reducer(state, action) {
   if (action.type === 'inc') {
     return { ...state, count: state.count+1 }
   }

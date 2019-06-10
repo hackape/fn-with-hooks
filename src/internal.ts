@@ -1,7 +1,9 @@
+type EffectCallback = () => (void | EffectDisposer)
+type EffectDeps = any[]
+type EffectDisposer = () => void
 export type IBucket = {
   states: any[]
-  effects: any[]
-  disposes: any[]
+  effects: [EffectCallback?, EffectDeps?, EffectDisposer?][]
   memos: any[]
   stateIdx: number
   effectIdx: number
@@ -20,7 +22,6 @@ export function getCurrentBucket(callerName='Hooks') {
     const bucket: IBucket = {
       states: [],
       effects: [],
-      disposes: [],
       memos: [],
       stateIdx: 0,
       effectIdx: 0,

@@ -40,8 +40,9 @@ export function reset(fn: Function) {
   _callstack.push(fn)
   const bucket = getCurrentBucket()
   try {
-    for (let dispose of bucket.disposes) {
-      if (typeof dispose === 'function') dispose()
+    for (const slot of bucket.effects) {
+      const disposer = slot[2]
+      if (typeof disposer === 'function') disposer()
     }
   } finally {
     _callstack.pop()

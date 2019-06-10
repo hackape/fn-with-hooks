@@ -48,28 +48,22 @@ function depsChanged(deps1: any[] | undefined, deps2: any[] | undefined) {
 export function useEffect(fn: Function, deps?: any[]) {
   const bucket = getCurrentBucket('useEffect()')
   if (deps !== undefined && !Array.isArray(deps)) {
-    throw new Error("useEffect depList must be array")
+    throw new Error("`deps` argument in `useEffect(callback, deps)` must be array")
   }
 
-  const effectIdx = bucket.effectIdx
-  if (!(effectIdx in bucket.effects)) {
-    bucket.effects[effectIdx] = []
-  }
-
-  const slot = bucket.effects[effectIdx]
-
+  const slot = bucket.effects[bucket.effectIdx] || (bucket.effects[bucket.effectIdx] = [])
   if (depsChanged(slot[1], deps)) {
     slot[0] = function effect() {
-      const prevDispose = bucket.disposes[effectIdx]
+      const prevDispose = slot[2]
       if (typeof prevDispose === 'function') {
         try {
           prevDispose()
         } finally {
-          bucket.disposes[effectIdx] = undefined
+          slot[2] = undefined
         }
       }
 
-      bucket.disposes[effectIdx] = fn()
+      slot[2] = fn()
     }
 
     slot[1] = deps

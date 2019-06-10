@@ -5,9 +5,9 @@ function decorator<T extends Function>(fn: T): T {
     _callstack.push(wrapper)
     const bucket = getCurrentBucket()
     // reset bucket index
-    bucket.nextStateIdx = 0
-    bucket.nextEffectIdx = 0
-    bucket.nextMemoizationIdx = 0
+    bucket.stateIdx = 0
+    bucket.effectIdx = 0
+    bucket.memoizationIdx = 0
 
     try {
       return fn.apply(this, arguments)

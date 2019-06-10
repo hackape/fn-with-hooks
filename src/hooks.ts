@@ -16,16 +16,16 @@ export function useReducer<R extends Reducer<any, any>, I>(
     throw new Error("useReducer() only valid inside an Articulated Function or a Custom Hook.")
   }
 
-  if (!(bucket.nextStateIdx in bucket.states)) {
+  if (!(bucket.stateIdx in bucket.states)) {
     const slot: any[] = []
     slot[0] = typeof initializer === "function" ? initializer(initializerArg) : initializerArg
     slot[1] = function dispatch(action) {
       slot[0] = reducer(slot[0], action)
     }
-    bucket.states[bucket.nextStateIdx] = slot
+    bucket.states[bucket.stateIdx] = slot
   }
 
-  return [...bucket.states[bucket.nextStateIdx++]] as any
+  return [...bucket.states[bucket.stateIdx++]] as any
 }
 
 export function useState<S>(initState: S | (() => S)): [S, Dispatch<SetStateAction<S>>] {
@@ -34,7 +34,7 @@ export function useState<S>(initState: S | (() => S)): [S, Dispatch<SetStateActi
     throw new Error("useState() only valid inside an Articulated Function or a Custom Hook.")
   }
 
-  if (!(bucket.nextStateIdx in bucket.states)) {
+  if (!(bucket.stateIdx in bucket.states)) {
     const slot = []
     slot[0] = initState
     slot[1] = function setState(state) {
@@ -44,10 +44,10 @@ export function useState<S>(initState: S | (() => S)): [S, Dispatch<SetStateActi
         slot[0] = state
       }
     }
-    bucket.states[bucket.nextStateIdx] = slot
+    bucket.states[bucket.stateIdx] = slot
   }
 
-  return [...bucket.states[bucket.nextStateIdx++]] as any
+  return [...bucket.states[bucket.stateIdx++]] as any
 }
 
 function depsChanged(deps1: any[] | undefined, deps2: any[] | undefined) {
@@ -69,7 +69,7 @@ export function useEffect(fn: Function, deps?: any[]) {
     throw new Error("useEffect depList must be array")
   }
 
-  const effectIdx = bucket.nextEffectIdx
+  const effectIdx = bucket.effectIdx
   if (!(effectIdx in bucket.effects)) {
     bucket.effects[effectIdx] = []
   }
@@ -93,7 +93,7 @@ export function useEffect(fn: Function, deps?: any[]) {
     slot[1] = deps
   }
 
-  bucket.nextEffectIdx++;
+  bucket.effectIdx++;
 }
 
 export function useMemo<T>(factory: () => T, deps: any[] | undefined): T {
@@ -102,8 +102,8 @@ export function useMemo<T>(factory: () => T, deps: any[] | undefined): T {
     throw new Error("useMemo() only valid inside an Articulated Function or a Custom Hook.")
   }
 
-  const memoizationIdx = bucket.nextMemoizationIdx
-  if (!(bucket.nextMemoizationIdx in bucket.memoizations)) {
+  const memoizationIdx = bucket.memoizationIdx
+  if (!(bucket.memoizationIdx in bucket.memoizations)) {
     bucket.memoizations[memoizationIdx] = [];
   }
 
@@ -117,7 +117,7 @@ export function useMemo<T>(factory: () => T, deps: any[] | undefined): T {
     }
   }
   
-  bucket.nextMemoizationIdx++
+  bucket.memoizationIdx++
 
   return slot[0]
 }

@@ -11,11 +11,7 @@ export function useReducer<R extends Reducer<any, any>, I>(
   initializerArg: I & ReducerState<R>,
   initializer?: (arg: I & ReducerState<R>) => ReducerState<R>
 ): [ReducerState<R>, Dispatch<ReducerAction<R>>] {
-  const bucket = getCurrentBucket()
-  if (!bucket) {
-    throw new Error("useReducer() only valid inside an Articulated Function or a Custom Hook.")
-  }
-
+  const bucket = getCurrentBucket('useReducer()')
   if (!(bucket.stateIdx in bucket.states)) {
     const slot: any[] = []
     slot[0] = typeof initializer === "function" ? initializer(initializerArg) : initializerArg
@@ -29,11 +25,7 @@ export function useReducer<R extends Reducer<any, any>, I>(
 }
 
 export function useState<S>(initState: S | (() => S)): [S, Dispatch<SetStateAction<S>>] {
-  const bucket = getCurrentBucket()
-  if (!bucket) {
-    throw new Error("useState() only valid inside an Articulated Function or a Custom Hook.")
-  }
-
+  const bucket = getCurrentBucket('useState()')
   if (!(bucket.stateIdx in bucket.states)) {
     const slot = []
     slot[0] = initState
@@ -60,11 +52,7 @@ function depsChanged(deps1: any[] | undefined, deps2: any[] | undefined) {
 }
 
 export function useEffect(fn: Function, deps?: any[]) {
-  const bucket = getCurrentBucket()
-  if (!bucket) {
-    throw new Error("useEffect() only valid inside an Articulated Function or a Custom Hook.")
-  }
-
+  const bucket = getCurrentBucket('useEffect()')
   if (deps !== undefined && !Array.isArray(deps)) {
     throw new Error("useEffect depList must be array")
   }
@@ -97,11 +85,7 @@ export function useEffect(fn: Function, deps?: any[]) {
 }
 
 export function useMemo<T>(factory: () => T, deps: any[] | undefined): T {
-  const bucket = getCurrentBucket()
-  if (!bucket) {
-    throw new Error("useMemo() only valid inside an Articulated Function or a Custom Hook.")
-  }
-
+  const bucket = getCurrentBucket('useMemo()')
   const memoizationIdx = bucket.memoizationIdx
   if (!(bucket.memoizationIdx in bucket.memoizations)) {
     bucket.memoizations[memoizationIdx] = [];
@@ -116,26 +100,19 @@ export function useMemo<T>(factory: () => T, deps: any[] | undefined): T {
       slot[1] = deps
     }
   }
-  
+
   bucket.memoizationIdx++
 
   return slot[0]
 }
 
 export function useCallback<T extends (...args: any[]) => any>(callback: T, deps: any[]): T {
-  const bucket = getCurrentBucket()
-  if (!bucket) {
-    throw new Error("useCallback() only valid inside an Articulated Function or a Custom Hook.")
-  }
-
+  getCurrentBucket('useCallback()')
   return useMemo(() => callback, deps)
 }
 
 export function useRef(initValue: any) {
-  const bucket = getCurrentBucket()
-  if (!bucket) {
-    throw new Error("useRef() only valid inside an Articulated Function or a Custom Hook.")
-  }
+  getCurrentBucket('useRef')
   const [ref] = useState({ current: initValue })
   return ref
 }

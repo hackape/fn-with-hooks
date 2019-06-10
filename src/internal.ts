@@ -2,10 +2,10 @@ export type IBucket = {
   states: any[]
   effects: any[]
   disposes: any[]
-  memoizations: any[]
+  memos: any[]
   stateIdx: number
   effectIdx: number
-  memoizationIdx: number
+  memoIdx: number
 }
 
 export const _buckets = new WeakMap<object, IBucket>()
@@ -21,10 +21,10 @@ export function getCurrentBucket(callerName='Hooks') {
       states: [],
       effects: [],
       disposes: [],
-      memoizations: [],
+      memos: [],
       stateIdx: 0,
       effectIdx: 0,
-      memoizationIdx: 0
+      memoIdx: 0
     }
     _buckets.set(currentFn, bucket)
   }

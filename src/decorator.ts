@@ -7,7 +7,7 @@ function decorator<T extends Function>(fn: T): T {
     // reset bucket index
     bucket.stateIdx = 0
     bucket.effectIdx = 0
-    bucket.memoizationIdx = 0
+    bucket.memoIdx = 0
 
     try {
       return fn.apply(this, arguments)

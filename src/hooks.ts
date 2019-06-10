@@ -80,12 +80,7 @@ export function useEffect(fn: Function, deps?: any[]) {
 
 export function useMemo<T>(factory: () => T, deps: any[] | undefined): T {
   const bucket = getCurrentBucket('useMemo()')
-  const memoizationIdx = bucket.memoizationIdx
-  if (!(bucket.memoizationIdx in bucket.memoizations)) {
-    bucket.memoizations[memoizationIdx] = [];
-  }
-
-  const slot = bucket.memoizations[memoizationIdx]
+  const slot = bucket.memos[bucket.memoIdx] || (bucket.memos[bucket.memoIdx] = [])
 
   if (depsChanged(slot[1], deps)) {
     try {
@@ -95,8 +90,7 @@ export function useMemo<T>(factory: () => T, deps: any[] | undefined): T {
     }
   }
 
-  bucket.memoizationIdx++
-
+  bucket.memoIdx++
   return slot[0]
 }
 

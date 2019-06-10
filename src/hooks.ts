@@ -24,22 +24,16 @@ export function useReducer<R extends Reducer<any, any>, I>(
   return [...bucket.states[bucket.stateIdx++]] as any
 }
 
-export function useState<S>(initState: S | (() => S)): [S, Dispatch<SetStateAction<S>>] {
-  const bucket = getCurrentBucket('useState()')
-  if (!(bucket.stateIdx in bucket.states)) {
-    const slot = []
-    slot[0] = initState
-    slot[1] = function setState(state) {
-      if (typeof state === 'function') {
-        slot[0] = state(slot[0])
-      } else {
-        slot[0] = state
-      }
-    }
-    bucket.states[bucket.stateIdx] = slot
-  }
+function useStateReducer(state, nextState) {
+  return typeof nextState === 'function' ? nextState(state) : nextState
+}
 
-  return [...bucket.states[bucket.stateIdx++]] as any
+export function useState<S>(initState: S | (() => S)): [S, Dispatch<SetStateAction<S>>] {
+  getCurrentBucket('useState()')
+  if (typeof initState === 'function') {
+    return useReducer(useStateReducer, undefined, initState as any)
+  }
+  return useReducer(useStateReducer, initState)
 }
 
 function depsChanged(deps1: any[] | undefined, deps2: any[] | undefined) {

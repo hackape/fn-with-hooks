@@ -1,6 +1,6 @@
 # fn-with-hooks
 
-> Credit to https://github.com/getify/TNG-Hooks. This lib is basically a re-implementation of TNG-Hooks in Typescript, with APIs aligned to React's hooks.
+> Credit to https://github.com/getify/TNG-Hooks. This lib is basically a re-implementation of TNG-Hooks in Typescript, with APIs aligned to React's hooks
 
 [React's hooks](https://reactjs.org/docs/hooks-overview.html) ported to plain functions.
 
